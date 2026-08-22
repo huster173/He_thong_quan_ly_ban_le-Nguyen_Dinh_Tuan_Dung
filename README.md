@@ -1,48 +1,153 @@
-# Hệ thống Đơn hàng & Kho hàng
-
 ## Build & run
 
-Yêu cầu: JDK 21+, Maven 3.9+, Node.js 18+ và Docker.
+Yêu cầu: **JDK 21+**, **Maven 3.9+**, **Node.js 18+** và **Docker Desktop**.
 
-Khởi động Oracle (chỉ cần làm một lần). `APP_USER` tạo sẵn schema riêng cho ứng
-dụng — bảng của app không nằm lẫn trong `SYSTEM`, và app không cần quyền DBA:
+### 1. Cài và khởi động Oracle bằng Docker
+
+Project sử dụng **Oracle Database Free** chạy trong Docker.
+
+Kiểm tra Docker đã cài:
 
 ```bash
-docker run -d --name oracle-db -p 1521:1521 \
+docker --version
+docker compose version
+```
+
+Nếu chưa có Oracle container, tạo container bằng:
+
+```bash
+docker run -d --name oracle-db \
+  -p 1521:1521 \
   -e ORACLE_PASSWORD=oracle \
-  -e APP_USER=shop -e APP_USER_PASSWORD=shop \
+  -e APP_USER=shop \
+  -e APP_USER_PASSWORD=shop \
   -v oracle-data:/opt/oracle/oradata \
   gvenzl/oracle-free:latest
 ```
 
-Nếu container đã được tạo từ trước mà chưa có schema này, tạo tay một lần:
+Các thông tin kết nối mặc định:
 
-```bash
-docker exec -i oracle-db sqlplus -s system/oracle@//localhost:1521/FREEPDB1 <<'SQL'
-CREATE USER shop IDENTIFIED BY shop;
-GRANT CONNECT, RESOURCE TO shop;
-ALTER USER shop QUOTA UNLIMITED ON USERS;
-exit;
-SQL
+```text
+Host:     localhost
+Port:     1521
+Service:  FREEPDB1
+Schema:   shop
+Username: shop
+Password: shop
 ```
 
-Backend tự tạo bảng và nạp dữ liệu mẫu trong lần chạy đầu. Thông tin kết nối mặc
-định nằm ở `application.properties`, đổi được qua biến môi trường `DB_URL`,
-`DB_USERNAME`, `DB_PASSWORD`.
-
-Chờ Oracle khởi động xong, rồi mở hai terminal.
+Kiểm tra container:
 
 ```bash
-# Terminal 1 — backend, http://localhost:8080
+docker ps
+```
+
+Có thể xem log để chờ Oracle khởi động hoàn tất:
+
+```bash
+docker logs -f oracle-db
+```
+
+Khi thấy Oracle đã sẵn sàng nhận kết nối thì có thể chạy backend.
+
+> **Lưu ý:** lần đầu Oracle khởi động có thể mất một vài phút. Chỉ cần tạo container một lần. Dữ liệu được lưu trong Docker volume `oracle-data`, nên việc restart container không làm mất dữ liệu.
+
+Nếu muốn dừng/chạy lại Oracle:
+
+```bash
+docker stop oracle-db
+docker start oracle-db
+```
+
+Nếu muốn xóa hoàn toàn database và tạo lại từ đầu:
+
+```bash
+docker rm -f oracle-db
+docker volume rm oracle-data
+```
+
+Sau đó chạy lại lệnh `docker run` ở trên.
+
+### 2. Cấu hình database
+
+Backend mặc định kết nối tới:
+
+```properties
+spring.datasource.url=${DB_URL:jdbc:oracle:thin:@//localhost:1521/FREEPDB1}
+spring.datasource.username=${DB_USERNAME:shop}
+spring.datasource.password=${DB_PASSWORD:shop}
+```
+
+Có thể thay đổi thông tin kết nối bằng biến môi trường:
+
+```text
+DB_URL
+DB_USERNAME
+DB_PASSWORD
+```
+
+Schema `shop` được tạo tự động khi Oracle container được khởi tạo thông qua:
+
+```text
+APP_USER=shop
+APP_USER_PASSWORD=shop
+```
+
+Vì vậy **không cần đăng nhập `SYSTEM` để tạo bảng cho ứng dụng**. Các bảng của project được tạo trong schema `SHOP`.
+
+### 3. Chạy backend
+
+Mở terminal:
+
+```bash
 cd backend
 mvn spring-boot:run
 ```
 
+Backend chạy tại:
+
+```text
+http://localhost:8080
+```
+
+Backend sẽ tự động tạo bảng và nạp dữ liệu mẫu trong lần chạy đầu tiên.
+
+### 4. Chạy frontend
+
+Mở terminal thứ hai:
+
 ```bash
-# Terminal 2 — frontend, http://localhost:5173
 cd frontend
 npm install
 npm run dev
 ```
 
-Mở http://localhost:5173 để sử dụng ứng dụng.
+Frontend chạy tại:
+
+```text
+http://localhost:5173
+```
+
+### 5. Sử dụng ứng dụng
+
+Mở trình duyệt:
+
+```text
+http://localhost:5173
+```
+
+Sau khi frontend và backend đều chạy, ứng dụng có thể được sử dụng.
+
+### Kiến trúc kết nối
+
+```text
+Frontend
+   │
+   │ HTTP
+   ▼
+Spring Boot Backend
+   │
+   │ JDBC
+   ▼
+Oracle Database
+  
