@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$/coreapi-v2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/delivery/delivery-api-service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/delivery/delivery-authorization-server" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/delivery/delivery-core" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/delivery/delivery-external-worker" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/delivery/delivery-internal-worker" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/delivery/delivery-middleware-api-service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/delivery/delivery-root" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/evtp2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/smart-box" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tm-delivery" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tm-delivery-worker" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tm-pickup-worker" vcs="Git" />
+  </component>
+</project>

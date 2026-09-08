@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="convention" />
+        <module name="express-delivery-middleware-api-service" />
+        <module name="encrypt" />
+        <module name="express-delivery-auth-server" />
+        <module name="express-delivery-internal-worker-service" />
+        <module name="express-delivery-api-service" />
+        <module name="express-delivery-external-worker-service" />
+        <module name="postgres" />
+        <module name="redis" />
+      </profile>
+    </annotationProcessing>
+  </component>
+</project>
